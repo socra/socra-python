@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "socra"
+version = "0.0.1"
+description = "The official Python library of socra AI"
+authors = []
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+click = "^8.1.7"
+openai = "^1.51.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+socra = "socra.cli:cli"
