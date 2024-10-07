@@ -23,3 +23,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 socra = "socra.cli:cli"
+
+
+[virtualenvs]
+# allows us to create virtual env in project root - allows VS Code to detect the virtual env
+in-project = true

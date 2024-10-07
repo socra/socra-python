@@ -1,5 +1,7 @@
 import click
 
+from socra.commands.improve import Improve
+
 
 @click.group()
 def cli():
@@ -21,6 +23,9 @@ def improve(target: str, level, prompt: str):
     print(f"Improving '{target}' with prompt '{prompt}'.")
     print("target", type(target))
     print("prompt", type(prompt), prompt)
+
+    command = Improve(config=Improve.Config(target=target, prompt=prompt))
+    command.execute()
 
 
 @cli.command()
