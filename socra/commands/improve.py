@@ -10,6 +10,9 @@ from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 import logging
 
+from socra.utils.decorators import throttle
+from socra.utils.spinner import Spinner
+
 
 def log(message: str):
     logging.info(message)
@@ -56,9 +59,11 @@ class Improve(Command):
         ]
         # prompt = ChatPromptTemplate.from_messages(messages)
 
+        spinner = Spinner(message=self.config.target)
+
+        @throttle(0.1)
         def on_chunk(stream_chunk: ChunkPayload):
-            pass
-            # print(stream_chunk)
+            spinner.spin()
 
         aggregate: AIMessageChunk = None
         for chunk in llm.stream(messages):
@@ -72,8 +77,15 @@ class Improve(Command):
 
             on_chunk(stream_chunk)
 
+        spinner.finish()
+
         log("Writing improved content to file.")
         content = aggregate.content
+
+        if content.startswith("```"):
+            # remove first and last line
+            content = "\n".join(content.split("\n")[1:-1])
+
         write_file(self.config.target, content)
 
 
@@ -81,5 +93,5 @@ system_prompt = """You are an expert code improver.
 Given some code, you will improve it with the following prompt:
 "{prompt}"
 
-Return only the improved code.
+Return only the improved code and nothing else.
 """

@@ -1,6 +1,8 @@
 # Poetry
 `socra-python` uses `poetry` for dependency management. Below is a guide on how to use it effectively.
 
+Add a new section for envs
+
 The `pyproject.toml` file contains definitions and dependencies for `socra`, serving a similar purpose to `package.json` in the JavaScript ecosystem.
 
 ## Installing Poetry
@@ -42,6 +44,4 @@ To update package versions, execute:
 
 ```bash
 poetry update
-``` 
-
-(add any clarification you think is useful)
+```
