@@ -9,18 +9,15 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 import logging
+import sys
 
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
 
 
-def log(message: str):
-    logging.info(message)
-
-
-class ImproveConfig(Schema):
+class DescribeConfig(Schema):
     target: str
-    prompt: str = None
+    prompt: str | None = None
 
 
 class ChunkPayload(Schema):
@@ -28,35 +25,34 @@ class ChunkPayload(Schema):
     aggregate: str
 
 
-class Improve(Command):
+class Describe(Command):
 
-    Config = ImproveConfig
+    Config = DescribeConfig
 
-    def __init__(self, config: ImproveConfig):
+    def __init__(self, config: DescribeConfig):
         self.config = config
 
     def execute(self):
 
-        # first, let's make sure target exists
-        if not os.path.exists(self.config.target):
-            raise FileNotFoundError(f"Target '{self.config.target}' not found.")
-
-        # make sure target is a file (for now)
         if not os.path.isfile(self.config.target):
             raise ValueError(f"Target '{self.config.target}' must be a file.")
 
-        # get file contents
         file_contents = read_file(self.config.target)
 
         # next, let's execute a prompt to improve the contents
         # TODO: instantiate llm elsewhere and make it super configurable
         llm = ChatOpenAI(model="gpt-4o-mini")
+
         messages: typing.List[BaseMessage] = [
-            SystemMessage(content=system_prompt.format(prompt=self.config.prompt)),
+            SystemMessage(
+                content=system_prompt.format(
+                    prompt=self.config.prompt if self.config.prompt else ""
+                )
+            ),
             HumanMessage(content=file_contents),
         ]
 
-        spinner = Spinner(message=f"Improving {self.config.target}")
+        spinner = Spinner(message=f"Describe {self.config.target}")
 
         @throttle(0.1)
         def on_chunk(stream_chunk: ChunkPayload):
@@ -82,12 +78,13 @@ class Improve(Command):
             # remove first and last line
             content = "\n".join(content.split("\n")[1:-1])
 
-        write_file(self.config.target, content)
+        # print content to stdout
+        sys.stdout.write(content)
 
 
-system_prompt = """You are an expert code improver.
-Given some code, you will improve it with the following prompt:
-"{prompt}"
+system_prompt = """You are an expert code describer.
+Given some code, you will provide a concise description/summary of the code.
+{prompt}
 
-Return only the improved code and nothing else.
+Return only your summary and nothing else.
 """
