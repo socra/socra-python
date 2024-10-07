@@ -9,15 +9,18 @@ def cli():
 
 @cli.command()
 @click.argument("target", type=click.Path(exists=True))
+@click.argument("prompt", type=click.STRING, required=False)
 @click.option(
     "--level",
     type=click.Choice(["low", "medium", "high"], case_sensitive=False),
     default="medium",
     help="Improvement level.",
 )
-def improve(target, level):
+def improve(target: str, level, prompt: str):
     """Improve the specified file or directory."""
-    print(f"Improving '{target}' with level '{level}'.")
+    print(f"Improving '{target}' with prompt '{prompt}'.")
+    print("target", type(target))
+    print("prompt", type(prompt), prompt)
 
 
 @cli.command()
