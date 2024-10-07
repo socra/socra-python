@@ -2,6 +2,15 @@ import click
 
 from socra.commands.improve import Improve
 
+from dotenv import load_dotenv
+
+
+def load_env():
+    load_dotenv()
+
+
+load_env()
+
 
 @click.group()
 def cli():

@@ -51,16 +51,17 @@ class Improve(Command):
         # TODO: instantiate llm elsewhere and make it super configurable
         llm = ChatOpenAI()
         messages: typing.List[BaseMessage] = [
-            SystemMessage(content=system_prompt.format(prompt)),
+            SystemMessage(content=system_prompt.format(prompt=self.config.prompt)),
             HumanMessage(content=file_contents),
         ]
-        prompt = ChatPromptTemplate(messages=messages)
+        # prompt = ChatPromptTemplate.from_messages(messages)
 
         def on_chunk(stream_chunk: ChunkPayload):
             pass
             # print(stream_chunk)
 
-        for chunk in llm.stream(prompt):
+        aggregate: AIMessageChunk = None
+        for chunk in llm.stream(messages):
             aggregate: AIMessageChunk = (
                 chunk if aggregate is None else aggregate + chunk
             )
