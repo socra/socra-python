@@ -7,3 +7,9 @@ commit:
 	git add -A; \
 	git commit -m "$$module"; \
 	git push origin $(CURRENT_GIT_BRANCH)
+
+build:
+	poetry build
+
+publish:
+	poetry publish --build
