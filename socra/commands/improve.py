@@ -37,7 +37,6 @@ class Improve(Command):
         self.config = config
 
     def execute(self):
-        log(f"Improving '{self.config.target}' with prompt '{self.config.prompt}'.")
 
         # first, let's make sure target exists
         if not os.path.exists(self.config.target):
@@ -52,14 +51,13 @@ class Improve(Command):
 
         # next, let's execute a prompt to improve the contents
         # TODO: instantiate llm elsewhere and make it super configurable
-        llm = ChatOpenAI()
+        llm = ChatOpenAI(model="gpt-4o-mini")
         messages: typing.List[BaseMessage] = [
             SystemMessage(content=system_prompt.format(prompt=self.config.prompt)),
             HumanMessage(content=file_contents),
         ]
-        # prompt = ChatPromptTemplate.from_messages(messages)
 
-        spinner = Spinner(message=self.config.target)
+        spinner = Spinner(message=f"Improving {self.config.target}")
 
         @throttle(0.1)
         def on_chunk(stream_chunk: ChunkPayload):

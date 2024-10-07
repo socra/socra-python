@@ -29,9 +29,6 @@ def cli():
 )
 def improve(target: str, level, prompt: str):
     """Improve the specified file or directory."""
-    print(f"Improving '{target}' with prompt '{prompt}'.")
-    print("target", type(target))
-    print("prompt", type(prompt), prompt)
 
     command = Improve(config=Improve.Config(target=target, prompt=prompt))
     command.execute()
