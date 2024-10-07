@@ -1,1 +1,1 @@
-Welcome to the official python of [socra AI](https://socra.com)
+Welcome to the official python library of [socra AI](https://socra.com)
