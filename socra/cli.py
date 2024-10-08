@@ -22,12 +22,6 @@ def cli():
 @cli.command()
 @click.argument("target", type=click.Path(exists=True))
 @click.argument("prompt", type=click.STRING, required=False)
-# @click.option(
-#     "--level",
-#     type=click.Choice(["low", "medium", "high"], case_sensitive=False),
-#     default="medium",
-#     help="Improvement level.",
-# )
 def improve(target: str, prompt: str):
     """Improve the specified file or directory."""
 
@@ -38,12 +32,6 @@ def improve(target: str, prompt: str):
 @cli.command()
 @click.argument("target", type=click.Path(exists=True))
 @click.argument("prompt", type=click.STRING, required=False)
-# @click.option(
-#     "--format",
-#     type=click.Choice(["json", "yaml", "xml"], case_sensitive=False),
-#     default="json",
-#     help="Output format for the description.",
-# )
 def describe(target: str, prompt: str):
     """Describe the specified file or directory."""
 
