@@ -13,3 +13,7 @@ build:
 
 publish:
 	poetry publish --build
+
+
+test:
+	poetry run pytest
