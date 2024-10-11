@@ -1,0 +1,89 @@
+name: Docs CI/CD Pipleine
+on:
+  # push:
+  #   branches: ["main"]
+  # pull_request:
+  #   types: [opened, synchronize]
+  release:
+    types:
+      - published
+
+jobs:
+  docs-build-push:
+    # Don't build unless event is a release
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./docs/Dockerfile
+            context: ./docs
+            image: socra/socra-python-docs
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          # password: ${{ secrets.GH_PACKAGE_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ env.REGISTRY }}/${{ matrix.image }}
+          # Tags with :latest only. e.g. ghcr.io/socra/socra-backend:latest
+          tags: "type=raw,value=prod-${{ env.CONTAINER_TAG_ID }}"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: ${{ matrix.context}}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # build-args: ${{ matrix.buildargs }}
+
+  # dispatch-prod:
+  #   # Dispatch if event is a release
+  #   if: github.event_name == 'release'
+  #   needs: [docs-build-push]
+  #   name: PROD dispatch to socra/infra
+  #   runs-on: ubuntu-latest
+  #   # environment: prod
+  #   env:
+  #     CONTAINER_TAG_ID: ${{ github.event.release.tag_name }}
+  #     EVENT_TYPE: new-images-prod
+  #   strategy:
+  #     matrix:
+  #       repo: ['socra/infra'] # Can be more than one repo here
+  #   timeout-minutes: 5
+  #   steps:
+  #     - name: Dispatch PROD
+  #       uses: peter-evans/repository-dispatch@v2
+  #       with:
+  #         token: ${{ secrets.REPO_SCOPED_ACCESS_TOKEN }}
+  #         repository: socra/infra
+  #         event-type: new-images-prod
+  #         client-payload: |
+  #           {
+  #           "ref": "${{ github.ref }}",
+  #           "event_type": "${{ env.EVENT_TYPE }}",
+  #           "sha": "${{ github.sha }}",
+  #           "containerId": "${{ env.CONTAINER_TAG_ID }}",
+  #           "propertyPath": "containers.socra.python.docs.id"
+  #           }
