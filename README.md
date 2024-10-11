@@ -45,7 +45,7 @@ Some interesting stats about code repos:
 
 ### socra as an Intelligent Replicator
 
-With this bilogical and market backdrop, let's draw some comparisons to software code.
+With this biological and market backdrop, let's draw some comparisons to software code.
 
 Until now, helpful mutations to code generally fall under the following categories:
 

@@ -39,5 +39,12 @@ def describe(target: str, prompt: str):
     command.execute()
 
 
+@click.group()
+@click.version_option()
+@click.pass_context
+def cli(ctx):
+    pass
+
+
 if __name__ == "__main__":
     cli()
