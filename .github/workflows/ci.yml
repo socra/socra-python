@@ -8,6 +8,10 @@ on:
     types:
       - published
 
+env:
+  REGISTRY: ghcr.io
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   docs-build-push:
     # Don't build unless event is a release
