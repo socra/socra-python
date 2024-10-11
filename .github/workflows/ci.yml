@@ -16,6 +16,14 @@ jobs:
   docs-build-push:
     # Don't build unless event is a release
     if: github.event_name == 'release'
+
+    env:
+      ENVIRONMENT: prod
+      # Use release version as tag for prod images
+      CONTAINER_TAG_ID: ${{ github.event.release.tag_name }}
+      APP_VERSION: ${{ github.event.release.tag_name || github.sha }}
+      APP_VERSION_DATE: ${{ github.event.repository.updated_at}}
+
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -89,5 +97,5 @@ jobs:
   #           "event_type": "${{ env.EVENT_TYPE }}",
   #           "sha": "${{ github.sha }}",
   #           "containerId": "${{ env.CONTAINER_TAG_ID }}",
-  #           "propertyPath": "containers.socra.python.docs.id"
+  #           "propertyPath": "containers.socra.python.id"
   #           }
