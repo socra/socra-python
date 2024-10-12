@@ -25,5 +25,6 @@ lint:
 	poetry run ruff format --diff
 
 
+# Trigger release workflow on github
 release:
 	gh workflow run _release.yml
