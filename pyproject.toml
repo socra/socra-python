@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "socra"
-version = "0.0.2"
+version = "0.0.3"
 description = "The official Python library of socra AI"
 authors = []
 license = "MIT"
