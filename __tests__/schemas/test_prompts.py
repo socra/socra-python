@@ -2,7 +2,6 @@ from socra.core.prompt import Prompt
 
 
 class TestPrompts:
-
     def test_instantiation(self):
         """
         - can instantiate a blank prompt
