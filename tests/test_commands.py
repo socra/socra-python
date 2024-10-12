@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic
+from typing import TypeVar
 
 
 Input = TypeVar("Input")

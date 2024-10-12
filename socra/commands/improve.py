@@ -5,7 +5,6 @@ from socra.commands.command import Command
 from socra.schemas.schema import Schema
 from socra.io.files import read_file, write_file
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 import logging
@@ -29,14 +28,12 @@ class ChunkPayload(Schema):
 
 
 class Improve(Command):
-
     Config = ImproveConfig
 
     def __init__(self, config: ImproveConfig):
         self.config = config
 
     def execute(self):
-
         # first, let's make sure target exists
         if not os.path.exists(self.config.target):
             raise FileNotFoundError(f"Target '{self.config.target}' not found.")

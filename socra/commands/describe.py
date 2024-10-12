@@ -1,15 +1,13 @@
 import os
 import typing
+import sys
 
 from socra.commands.command import Command
 from socra.schemas.schema import Schema
-from socra.io.files import read_file, write_file
+from socra.io.files import read_file
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
-import logging
-import sys
 
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
@@ -26,14 +24,12 @@ class ChunkPayload(Schema):
 
 
 class Describe(Command):
-
     Config = DescribeConfig
 
     def __init__(self, config: DescribeConfig):
         self.config = config
 
     def execute(self):
-
         if not os.path.isfile(self.config.target):
             raise ValueError(f"Target '{self.config.target}' must be a file.")
 

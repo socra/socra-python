@@ -5,7 +5,6 @@
 🧬 Let your codebase improve itself with AI, from the command line.
 
 [![Release Notes](https://img.shields.io/github/v/release/socra/socra.svg?style=flat-square)](https://github.com/socra/socra-python/releases)
-[![CI](https://github.com/socra/socra-python/actions/workflows/check_diffs.yml/badge.svg)](https://github.com/socra/socra-python/actions/workflows/check_diffs.yml)
 [![PyPI - License](https://img.shields.io/pypi/l/socra?style=flat-square)](https://opensource.org/licenses/MIT)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/socra?style=flat-square)](https://pypistats.org/packages/socra)
 [![GitHub star chart](https://img.shields.io/github/stars/socra/socra-python?style=flat-square)](https://star-history.com/#socra/socra-python)
