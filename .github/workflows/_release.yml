@@ -1,3 +1,5 @@
+# See https://github.com/langchain-ai/langchain/tree/master/.github/workflows/_release.yml
+# for inspiration of this release
 name: release
 run-name: Release by @${{ github.actor }}
 on:
@@ -83,7 +85,6 @@ jobs:
           echo prev-tag="$PREV_TAG" >> $GITHUB_OUTPUT
       - name: Generate release body
         id: generate-release-body
-        working-directory: langchain
         env:
           # WORKING_DIR: ${{ inputs.working-directory }}
           WORKING_DIR: .
@@ -117,4 +118,3 @@ jobs:
           body: ${{ steps.generate-release-body.outputs.release-body }}
           commit: ${{ github.sha }}
           makeLatest: true
-          # makeLatest: ${{ needs.build.outputs.pkg-name == 'langchain-core'}}

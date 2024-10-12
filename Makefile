@@ -26,4 +26,4 @@ lint:
 
 
 release:
-	gh workflow run release.yml
+	gh workflow run _release.yml
