@@ -1,0 +1,43 @@
+---
+name: CI on push
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# if job is already running on same branch, it's now outdated,
+# so cancel it
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  POETRY_VERSION: "1.8.3"
+
+jobs:
+  format-lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install poetry
+        uses: snok/install-poetry@v1
+        # with:
+        #   version: ${{ env.POETRY_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          poetry install --with test,lint
+
+      - name: Format, Lint
+        run: |
+          make lint
+
+      - name: Test
+        run: |
+          make test
