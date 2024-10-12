@@ -1,4 +1,6 @@
 # socra
+![logo](https://socra.com/images/og/socra_1400x700.png)
+
 
 🧬 Let your codebase improve itself with AI, from the command line.
 
