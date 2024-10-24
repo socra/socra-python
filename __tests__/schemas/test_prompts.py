@@ -1,4 +1,4 @@
-from socra.core.prompt import Prompt
+import socra
 
 
 class TestPrompts:
@@ -9,17 +9,17 @@ class TestPrompts:
         - can instantiate a prompt with messages
         """
 
-        prompt = Prompt()
+        prompt = socra.Prompt()
         assert len(prompt.messages) == 0
 
         prompt.add_message(
-            Prompt.Message(role=Prompt.Message.Role.SYSTEM, content="hello world")
+            socra.Message(role=socra.Message.Role.SYSTEM, content="hello world")
         )
         assert len(prompt.messages) == 1
 
-        prompt = Prompt(
+        prompt = socra.Prompt(
             messages=[
-                Prompt.Message(role=Prompt.Message.Role.SYSTEM, content="hello world")
+                socra.Message(role=socra.Message.Role.SYSTEM, content="hello world")
             ]
         )
         assert len(prompt.messages) == 1

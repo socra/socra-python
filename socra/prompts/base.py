@@ -13,7 +13,7 @@ from socra.models import Model
 
 
 class Prompt(Schema):
-    messages: typing.List[Message]
+    messages: typing.List[Message] = []
 
     def to_json(self):
         return {
@@ -41,34 +41,36 @@ class Prompt(Schema):
             raise ValidationError("data should be a dict")
 
         messages = data.get("messages")
-        if messages is None:
-            raise ValidationError("messages should be included")
+        # if messages is None:
+        #     raise ValidationError("messages should be included")
 
         # convert string to list of messages
+
         if isinstance(messages, str):
             messages = [Message(role=Message.Role.HUMAN, content=messages)]
 
-        if not isinstance(messages, list):
+        if messages is not None and not isinstance(messages, list):
             raise ValidationError("messages should be a list")
 
         # validate system message
         # should be max of 1 system message,
         # and if present should be first
         system_message_count = 0
-        for i, message in enumerate(messages):
-            if not isinstance(message, Message):
-                raise ValidationError(
-                    f"message at index {i} should be an instance of Message"
-                )
-            if message.role == Message.Role.SYSTEM:
-                system_message_count += 1
-                if i != 0:
-                    raise ValidationError("system message should be first message")
+        if messages is not None:
+            for i, message in enumerate(messages):
+                if not isinstance(message, Message):
+                    raise ValidationError(
+                        f"message at index {i} should be an instance of Message"
+                    )
+                if message.role == Message.Role.SYSTEM:
+                    system_message_count += 1
+                    if i != 0:
+                        raise ValidationError("system message should be first message")
 
-        if system_message_count > 1:
-            raise ValidationError("only one system message is allowed")
+            if system_message_count > 1:
+                raise ValidationError("only one system message is allowed")
 
-        return_data["messages"] = messages
+            return_data["messages"] = messages
 
         return return_data
 
