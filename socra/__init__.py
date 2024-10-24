@@ -4,6 +4,7 @@ from socra.models import Model
 from socra.prompts import Prompt
 from socra.schemas import Schema
 from socra.completions import Completion
+from socra.files import File
 
 
 __all__ = [

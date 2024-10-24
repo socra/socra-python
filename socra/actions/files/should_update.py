@@ -4,6 +4,7 @@ from socra.io.files import read_file, write_file
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
 import typing
+import json
 
 
 class Inputs(socra.Schema):
@@ -11,10 +12,16 @@ class Inputs(socra.Schema):
     prompt: str = None
 
 
-class ActionImproveFile(socra.Action[Inputs, str]):
-    Inputs: typing.ClassVar = Inputs
+class Outputs(socra.Schema):
+    should_update: bool
+    reason: str
 
-    def run(self, inputs) -> str:
+
+class ActionShouldUpdateFile(socra.Action[Inputs, Outputs]):
+    Inputs: typing.ClassVar = Inputs
+    Outputs: typing.ClassVar = Outputs
+
+    def run(self, inputs) -> "Outputs":
         if not os.path.exists(inputs.target):
             raise FileNotFoundError(f"Target '{inputs.target}' not found.")
 
@@ -35,10 +42,10 @@ class ActionImproveFile(socra.Action[Inputs, str]):
             ]
         )
 
-        spinner = Spinner(message=f"Improving {inputs.target}")
+        spinner = Spinner(message=f"Deciding whether to update {inputs.target}")
 
         @throttle(0.1)
-        def on_chunk(stream_chunk):
+        def on_chunk(chunk):
             spinner.spin()
 
         cr = socra.Completion(
@@ -49,20 +56,42 @@ class ActionImproveFile(socra.Action[Inputs, str]):
         )
         resp = cr.process()
 
-        spinner.finish()
         content = resp.content
 
-        if content.startswith("```"):
-            # remove first and last line
-            content = "\n".join(content.split("\n")[1:-1])
+        # parse JSON response
+        dct = json.loads(content)
+        outputs = Outputs(**dct)
 
-        write_file(inputs.target, content)
-        return content
+        if outputs.should_update:
+            spinner.message = (
+                f"Decided to update {inputs.target} because {outputs.reason.lower()}"
+            )
+        else:
+            spinner.message = f"Decided not to update {inputs.target} because {outputs.reason.lower()}"
+
+        spinner.finish()
+
+        return outputs
 
 
-system_prompt = """You are an expert code improver.
-Given some code, you will improve it with the following prompt:
+system_prompt = """You are an expert decision maker.
+
+Based on the following prompt, should the file be updated?
 "{prompt}"
 
-Return only the improved code and nothing else.
+
+Your response should be in JSON format with the following structure:
+If you believe the file should be updated:
+{{
+    "should_update": true,
+    "reason": "the file..."
+}}
+
+If you believe the file should not be updated:
+{{
+    "should_update": false,
+    "reason": "the file..."
+}}
+
+Respond ONLY with the JSON structure above.
 """
