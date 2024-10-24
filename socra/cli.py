@@ -27,7 +27,6 @@ def cli():
 @click.argument("prompt", type=click.STRING, required=False)
 def improve(target: str, prompt: str):
     """Improve the specified file or directory."""
-    print("adding improve")
 
     a = NodeRootAction()
     node = Node.for_path(target)
