@@ -1,4 +1,4 @@
-from socra.core.messages import Message
+import socra
 
 
 class TestMessages:
@@ -11,30 +11,33 @@ class TestMessages:
         """
 
         # can instantiate a message
-        message = Message(role=Message.Role.SYSTEM, content="hello world")
-        assert message.role == Message.Role.SYSTEM
+        message = socra.Message(role=socra.Message.Role.SYSTEM, content="hello world")
+        assert message.role == socra.Message.Role.SYSTEM
         assert len(message.content) == 1
         assert message.content[0].text == "hello world"
 
         # can instantiate a message with multiple parts
-        message = Message(
-            role=Message.Role.SYSTEM, content=[Message.Part(text="Hello world")]
+        message = socra.Message(
+            role=socra.Message.Role.SYSTEM,
+            content=[socra.Message.Part(text="Hello world")],
         )
 
-        assert message.role == Message.Role.SYSTEM
+        assert message.role == socra.Message.Role.SYSTEM
         assert len(message.content) == 1
         assert message.content[0].text == "Hello world"
 
         # can instantiate a message with a name
-        message = Message(
-            role=Message.Role.SYSTEM,
-            content=[Message.Part(text="Hello world")],
+        message = socra.Message(
+            role=socra.Message.Role.SYSTEM,
+            content=[socra.Message.Part(text="Hello world")],
             name="name",
         )
         assert message.name == "name"
 
         # can instantiate message with different roles
-        message = Message(role=Message.Role.HUMAN, content="hello world")
-        assert message.role == Message.Role.HUMAN
-        message = Message(role=Message.Role.ASSISTANT, content="hello world")
-        assert message.role == Message.Role.ASSISTANT
+        message = socra.Message(role=socra.Message.Role.HUMAN, content="hello world")
+        assert message.role == socra.Message.Role.HUMAN
+        message = socra.Message(
+            role=socra.Message.Role.ASSISTANT, content="hello world"
+        )
+        assert message.role == socra.Message.Role.ASSISTANT
