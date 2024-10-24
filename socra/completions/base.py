@@ -51,7 +51,7 @@ class ChunkPayload(Schema):
     aggregate: str
 
 
-class CompletionResponse:
+class Completion:
     def __init__(
         self,
         model: Model,

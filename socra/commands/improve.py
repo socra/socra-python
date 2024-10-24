@@ -12,6 +12,8 @@ import logging
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
 
+import socra
+
 
 def log(message: str):
     logging.info(message)
@@ -45,13 +47,16 @@ class Improve(Command):
         # get file contents
         file_contents = read_file(self.config.target)
 
-        # next, let's execute a prompt to improve the contents
-        # TODO: instantiate llm elsewhere and make it super configurable
-        llm = ChatOpenAI(model="gpt-4o-mini")
-        messages: typing.List[BaseMessage] = [
-            SystemMessage(content=system_prompt.format(prompt=self.config.prompt)),
-            HumanMessage(content=file_contents),
-        ]
+        model = socra.Model.for_key(socra.Model.Key.GPT_4O_MINI_2024_07_18)
+        prompt = socra.Prompt(
+            messages=[
+                socra.Message(
+                    role=socra.Message.Role.SYSTEM,
+                    content=system_prompt.format(prompt=self.config.prompt),
+                ),
+                socra.Message(role=socra.Message.Role.HUMAN, content=file_contents),
+            ]
+        )
 
         spinner = Spinner(message=f"Improving {self.config.target}")
 
@@ -59,21 +64,36 @@ class Improve(Command):
         def on_chunk(stream_chunk: ChunkPayload):
             spinner.spin()
 
-        aggregate: AIMessageChunk = None
-        for chunk in llm.stream(messages):
-            aggregate: AIMessageChunk = (
-                chunk if aggregate is None else aggregate + chunk
-            )
-            stream_chunk = ChunkPayload(
-                chunk=chunk.content,
-                aggregate=aggregate.content,
-            )
+        cr = socra.Completion(
+            model,
+            prompt,
+            # mock_response=params.mock_response,
+            on_chunk=on_chunk,
+        )
+        resp = cr.process()
 
-            on_chunk(stream_chunk)
+        # next, let's execute a prompt to improve the contents
+        # TODO: instantiate llm elsewhere and make it super configurable
+        # llm = ChatOpenAI(model="gpt-4o-mini")
+        # messages: typing.List[BaseMessage] = [
+        #     SystemMessage(content=system_prompt.format(prompt=self.config.prompt)),
+        #     HumanMessage(content=file_contents),
+        # ]
+
+        # aggregate: AIMessageChunk = None
+        # for chunk in llm.stream(messages):
+        #     aggregate: AIMessageChunk = (
+        #         chunk if aggregate is None else aggregate + chunk
+        #     )
+        #     stream_chunk = ChunkPayload(
+        #         chunk=chunk.content,
+        #         aggregate=aggregate.content,
+        #     )
+
+        #     on_chunk(stream_chunk)
 
         spinner.finish()
-
-        content = aggregate.content
+        content = resp.content
 
         if content.startswith("```"):
             # remove first and last line

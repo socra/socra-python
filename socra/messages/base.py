@@ -113,7 +113,7 @@ class Message(Schema):
 
         raise ValueError(f"Invalid role {self.role} for Message.")
 
-    def count_tokens(self, model: Model) -> int:
+    def count_tokens(self, model: "Model") -> int:
         """Count total tokens for message, taking into account
         that the message might be content of parts
         """
