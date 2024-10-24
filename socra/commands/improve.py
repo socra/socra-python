@@ -1,12 +1,8 @@
 import os
-import typing
 
 from socra.commands.command import Command
 from socra.schemas.base import Schema
 from socra.io.files import read_file, write_file
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage
-from langchain_core.messages.ai import AIMessageChunk
 import logging
 
 from socra.utils.decorators import throttle
@@ -71,26 +67,6 @@ class Improve(Command):
             on_chunk=on_chunk,
         )
         resp = cr.process()
-
-        # next, let's execute a prompt to improve the contents
-        # TODO: instantiate llm elsewhere and make it super configurable
-        # llm = ChatOpenAI(model="gpt-4o-mini")
-        # messages: typing.List[BaseMessage] = [
-        #     SystemMessage(content=system_prompt.format(prompt=self.config.prompt)),
-        #     HumanMessage(content=file_contents),
-        # ]
-
-        # aggregate: AIMessageChunk = None
-        # for chunk in llm.stream(messages):
-        #     aggregate: AIMessageChunk = (
-        #         chunk if aggregate is None else aggregate + chunk
-        #     )
-        #     stream_chunk = ChunkPayload(
-        #         chunk=chunk.content,
-        #         aggregate=aggregate.content,
-        #     )
-
-        #     on_chunk(stream_chunk)
 
         spinner.finish()
         content = resp.content

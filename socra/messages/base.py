@@ -101,6 +101,8 @@ class Message(Schema):
         else:
             dct["content"] = [part.to_json() for part in self.content]
 
+        return dct
+
     def to_langchain(self) -> LCAIMessage | LCHumanMessage | LCSystemMessage:
         dct = self.to_json()
 
