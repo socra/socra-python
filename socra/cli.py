@@ -3,7 +3,10 @@ import click
 from socra.commands.describe import Describe
 
 from dotenv import load_dotenv
-from socra.files import File
+from socra.nodes import Node
+from socra.nodes.actions.add_child import NodeAddChild
+from socra.nodes.actions.content_update import NodeContentUpdate
+from socra.nodes.actions.root import ActionKey, NodeRootAction
 
 
 def load_env():
@@ -26,11 +29,20 @@ def improve(target: str, prompt: str):
     """Improve the specified file or directory."""
     print("adding improve")
 
-    f = File(target)
+    a = NodeRootAction()
+    node = Node.for_path(target)
 
-    r = f.should_update(prompt)
-    if r.should_update:
-        f.update(prompt)
+    output = a.run(a.Inputs(node=node, prompt=prompt))
+
+    if output.key == ActionKey.UPDATE_CONTENT:
+        content = NodeContentUpdate().run(
+            NodeContentUpdate.Inputs(node=Node.for_path(target), prompt=prompt)
+        )
+        node.content = content
+        node.save()
+    elif output.key == ActionKey.ADD_CHILD:
+        out = NodeAddChild().run(NodeAddChild.Inputs(node=node, prompt=prompt))
+        node.add_child(name=out.name, type=out.type)
 
 
 @cli.command()

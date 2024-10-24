@@ -26,6 +26,19 @@ class File:
     def is_file(cls, file: str) -> bool:
         return os.path.isfile(file)
 
+    @classmethod
+    def create(cls, file: str, content: str = None) -> "File":
+        """
+        Create a new file
+        """
+        if os.path.exists(file):
+            raise FileExistsError(f"File '{file}' already exists.")
+
+        with open(file, "w", encoding="utf-8") as f:
+            if content:
+                f.write(content)
+        return cls(file)
+
     @property
     def content(self) -> str:
         should_read = False
@@ -60,3 +73,11 @@ class File:
         a.run(a.Inputs(target=self.file, prompt=prompt))
         # trigger re-read
         return self.content
+
+    def rename(self, new_name: str):
+        """
+        Rename the file. Includes only the file name (not the path)
+        """
+        new_path = os.path.join(os.path.dirname(self.file), new_name)
+        os.rename(self.file, new_path)
+        self.file = new_path
