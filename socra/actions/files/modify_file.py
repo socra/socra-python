@@ -1,69 +1,50 @@
 import os
-
-from socra.commands.command import Command
-from socra.schemas.base import Schema
+import socra
 from socra.io.files import read_file, write_file
-import logging
-
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
-
-import socra
-
-
-def log(message: str):
-    logging.info(message)
+import typing
 
 
-class ImproveConfig(Schema):
+class Inputs(socra.Schema):
     target: str
     prompt: str = None
 
 
-class ChunkPayload(Schema):
-    chunk: str
-    aggregate: str
+class ActionImproveFile(socra.Action[Inputs, None]):
+    Inputs: typing.ClassVar = Inputs
 
-
-class Improve(Command):
-    Config = ImproveConfig
-
-    def __init__(self, config: ImproveConfig):
-        self.config = config
-
-    def execute(self):
-        # first, let's make sure target exists
-        if not os.path.exists(self.config.target):
-            raise FileNotFoundError(f"Target '{self.config.target}' not found.")
+    def run(self, inputs):
+        if not os.path.exists(inputs.target):
+            raise FileNotFoundError(f"Target '{inputs.target}' not found.")
 
         # make sure target is a file (for now)
-        if not os.path.isfile(self.config.target):
-            raise ValueError(f"Target '{self.config.target}' must be a file.")
+        if not os.path.isfile(inputs.target):
+            raise ValueError(f"Target '{inputs.target}' must be a file.")
 
-        # get file contents
-        file_contents = read_file(self.config.target)
+        file_contents = read_file(inputs.target)
 
         model = socra.Model.for_key(socra.Model.Key.GPT_4O_MINI_2024_07_18)
         prompt = socra.Prompt(
             messages=[
                 socra.Message(
                     role=socra.Message.Role.SYSTEM,
-                    content=system_prompt.format(prompt=self.config.prompt),
+                    content=system_prompt.format(prompt=inputs.prompt),
                 ),
                 socra.Message(role=socra.Message.Role.HUMAN, content=file_contents),
             ]
         )
 
-        spinner = Spinner(message=f"Improving {self.config.target}")
+        spinner = Spinner(message=f"Improving {inputs.target}")
 
         @throttle(0.1)
-        def on_chunk(stream_chunk: ChunkPayload):
+        def on_chunk(stream_chunk):
             spinner.spin()
 
         cr = socra.Completion(
             model,
             prompt,
-            # mock_response=params.mock_response,
+            # mock_response=inputs.mock_response,
             on_chunk=on_chunk,
         )
         resp = cr.process()
@@ -75,7 +56,7 @@ class Improve(Command):
             # remove first and last line
             content = "\n".join(content.split("\n")[1:-1])
 
-        write_file(self.config.target, content)
+        write_file(inputs.target, content)
 
 
 system_prompt = """You are an expert code improver.

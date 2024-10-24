@@ -1,9 +1,9 @@
 import click
 
 from socra.commands.describe import Describe
-from socra.commands.improve import Improve
 
 from dotenv import load_dotenv
+from socra.actions.files.modify_file import ActionImproveFile
 
 
 def load_env():
@@ -26,8 +26,8 @@ def improve(target: str, prompt: str):
     """Improve the specified file or directory."""
     print("adding improve")
 
-    command = Improve(config=Improve.Config(target=target, prompt=prompt))
-    command.execute()
+    a = ActionImproveFile()
+    a.run(a.Inputs(target=target, prompt=prompt))
 
 
 @cli.command()

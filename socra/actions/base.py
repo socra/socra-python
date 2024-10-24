@@ -18,7 +18,7 @@ class Action(Generic[TInput, TOutput], ABC):
     """
 
     @abstractmethod
-    def run(self, params: TInput) -> TOutput:
+    def run(self, inputs: TInput) -> TOutput:
         pass
 
     @property
@@ -27,7 +27,7 @@ class Action(Generic[TInput, TOutput], ABC):
         The input type for this Action. Inferred from the Generic input type.
         Can be overriden explicitly in subclasses (but you probably shouldn't).
         """
-        return self.__class__.__annotations__.get("params", Any)
+        return self.__class__.__annotations__.get("inputs", Any)
 
     @property
     def OutputType(self) -> Type[TOutput]:
