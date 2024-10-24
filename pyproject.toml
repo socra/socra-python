@@ -15,6 +15,7 @@ langchain-openai = "^0.2.2"
 langchain-community = "^0.3.1"
 langchain-anthropic = "^0.2.3"
 pydantic = "^2.9.2"
+tiktoken = "^0.8.0"
 
 
 [tool.poetry.group.test.dependencies]

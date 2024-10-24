@@ -1,7 +1,7 @@
 import typing
 
 
-from socra.schemas.schema import Schema
+from socra.schemas import Schema
 
 from socra.core.messages import Message
 

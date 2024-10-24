@@ -2,7 +2,7 @@ import os
 import typing
 
 from socra.commands.command import Command
-from socra.schemas.schema import Schema
+from socra.schemas.base import Schema
 from socra.io.files import read_file, write_file
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage

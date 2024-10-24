@@ -1,7 +1,7 @@
 import typing
 
 from enum import Enum
-from socra.schemas.schema import Schema
+from socra.schemas.base import Schema
 from pydantic import model_validator
 
 
