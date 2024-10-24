@@ -3,7 +3,6 @@ import click
 from socra.commands.describe import Describe
 
 from dotenv import load_dotenv
-from socra.actions.files.modify_file import ActionImproveFile
 from socra.files import File
 
 

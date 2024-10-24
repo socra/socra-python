@@ -16,4 +16,5 @@ __all__ = [
     "Prompt",
     "Schema",
     "Completion",
+    "File",
 ]

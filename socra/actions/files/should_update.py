@@ -1,6 +1,6 @@
 import os
 import socra
-from socra.io.files import read_file, write_file
+from socra.io.files import read_file
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
 import typing

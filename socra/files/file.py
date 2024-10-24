@@ -28,7 +28,6 @@ class File:
 
     @property
     def content(self) -> str:
-
         should_read = False
         last_modified = os.path.getmtime(self.file)
 
