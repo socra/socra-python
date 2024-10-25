@@ -71,7 +71,7 @@ class Completion:
             content = self._mock_response.content
             token_usage = self._mock_response.usage
         else:
-            llm = ChatOpenAI(model=self.model.key)
+            llm = ChatOpenAI(model=self.model.key.value)
             prompt_messages = self.prompt.to_langchain()
 
             if self.on_chunk is not None:

@@ -52,6 +52,13 @@ class Node(Schema):
         """
         return os.path.basename(self.path)
 
+    @property
+    def parent(self) -> "Node":
+        """
+        The parent of the node.
+        """
+        return Node.for_path(os.path.dirname(self.path))
+
     @classmethod
     def for_path(cls, path: str) -> "Node":
         """
