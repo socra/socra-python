@@ -71,7 +71,14 @@ From your favorite terminal, make sure `socra` is installed:
 socra --version
 ```
 
-To quickly improve any file or directory
+To quickly improve any file or directory:
+```bash
+socra improve <path_to_target> "<instructions>"
+
+# E.g.
+socra improve ./src/main.py "Add docstrings to this file and clean it!"
+```
+
 
 
 ## Concepts
@@ -92,4 +99,3 @@ An API is a set of rules that connect one application to another. In `socra`, an
 Executors use APIs and an objective to work toward a goal.
 
 For example, an agent `executor` can interact with a File API for a codebase in order to achieve an objective, perform some action, or instantiate another executor (one more suitable for the task at hand, for example)
-
