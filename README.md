@@ -13,9 +13,13 @@
 
 
 ## Installation
+First, install the library:
 ```bash
 pip install socra
 ```
+
+Next, be sure to set an `OPENAI_API_KEY` environment variable. `socra` currently uses OpenAI for LLM requests, but aim to add multiple providers in the near future. See [OpenAI's docs](https://platform.openai.com/docs/quickstart) if you don't yet have an API key.
+
 
 ## 🤔 What is socra?
 
@@ -67,4 +71,25 @@ From your favorite terminal, make sure `socra` is installed:
 socra --version
 ```
 
+To quickly improve any file or directory
+
+
+## Concepts
+
+### Node
+A `node` represents an object in a hierarchy. `node` can have exactly one parent and zero or more children. Some node types can have children, and others can't (leaf nodes).
+
+### Action
+An `action` is a functional unit with defined input and output parameters. Actions can implement regular functions, use AI, call other actions, or any combination thereof. In this way, actions are incredibly flexible functional units.
+
+### Capability
+Capabilities strictly define one object's capabilities on another. For example, an agent may have differing capabilities based on its model type, the node it is interacting with, and other criteria. Capabilities start with `can_`.
+
+### API
+An API is a set of rules that connect one application to another. In `socra`, an API is typically used to connect `nodes`, `actions`, and `capabilities` together internally.
+
+### Executor
+Executors use APIs and an objective to work toward a goal.
+
+For example, an agent `executor` can interact with a File API for a codebase in order to achieve an objective, perform some action, or instantiate another executor (one more suitable for the task at hand, for example)
 
