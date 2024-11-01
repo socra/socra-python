@@ -1,0 +1,7 @@
+name: Await User Input
+description: |
+  Await user input from the console before continuing.
+  Useful when you need to ask a question or gather more information from the user.
+
+type: executable
+runs: action.AwaitInputAction
