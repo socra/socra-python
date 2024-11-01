@@ -40,20 +40,22 @@ class Agent(Schema):
         if len(self.children) > 0:
             child_to_call = decide(self, context)
 
-            current_attempts = 0
-            while current_attempts < max_retries:
-                try:
-                    child_to_call.run(context)
-                    break
-                except Exception as e:
-                    current_attempts += 1
-                    context.add_message(
-                        Message(
-                            role=Message.Role.ASSISTANT,
-                            content=f"Error running {child_to_call.key}: {e}",
-                        )
-                    )
-                    child_to_call = decide(self, context)
+            child_to_call.run(context)
+
+            # current_attempts = 0
+            # while current_attempts < max_retries:
+            #     # try:
+            #         child_to_call.run(context)
+            #         break
+            #     except Exception as e:
+            #         current_attempts += 1
+            #         context.add_message(
+            #             Message(
+            #                 role=Message.Role.ASSISTANT,
+            #                 content=f"Error running {child_to_call.key}: {e}",
+            #             )
+            #         )
+            #         child_to_call = decide(self, context)
 
         elif self.runs:
             self.runs(context)

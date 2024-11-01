@@ -1,5 +1,6 @@
 from socra.agents.context import Context
 import os
+import typing
 
 from socra.parsers import parse_json
 from socra.io.files import read_file, write_file
@@ -48,6 +49,89 @@ def create_directory(context: Context):
     context.start_thinking(f"Creating a new directory at {file_path}")
     os.makedirs(file_path)
     context.stop_thinking(f"New directory is now created: {file_path}")
+
+
+def list_files_and_folders(context: Context):
+
+    file_path = get_file_path(context)
+
+    # next, make sure file path exists
+    if not os.path.exists(file_path):
+        context.stop_thinking(f"File path '{file_path}' does not exist")
+
+    context.start_thinking(f"Listing files and folders at {file_path}")
+    files = os.listdir(file_path)
+    context.stop_thinking(f"Files and folders at {file_path}: {files}")
+
+
+def rename_file_or_folder(context: Context):
+    old_path, new_path = get_old_and_new_file_paths(context)
+
+    # next, make sure file path exists
+    if not os.path.exists(old_path):
+        context.start_thinking(f"Checking if file path exists: {old_path}")
+        context.stop_thinking(f"Path does not exist '{old_path}' does not exist")
+
+    context.start_thinking(f"Renaming {old_path} to {new_path}")
+    os.rename(old_path, new_path)
+    context.stop_thinking(f"DONE: Successfully renamed {old_path} to {new_path}.")
+
+
+def get_old_and_new_file_paths(context: Context) -> typing.Tuple[str, str]:
+
+    prompt = socra.Prompt(
+        messages=[
+            *context.messages,
+            socra.Message(
+                role=socra.Message.Role.HUMAN,
+                content=get_old_and_new_file_paths_prompt,
+            ),
+        ]
+    )
+    model = socra.Model.for_key(socra.Model.Key.GPT_4O_MINI_2024_07_18)
+    context.start_thinking("Getting old and new file paths")
+
+    @throttle(0.1)
+    def on_chunk(chunk):
+        context.spinner.spin()
+
+    cr = socra.Completion(
+        model,
+        prompt,
+        # mock_response=inputs.mock_response,
+        on_chunk=on_chunk,
+    )
+    resp = cr.process()
+    context.track_completion(cr)
+
+    content = resp.content
+    dct = parse_json(content)
+    if "old_path" not in dct:
+        raise ValueError("Missing 'old_path' in response")
+    if "new_path" not in dct:
+        raise ValueError("Missing 'new_path' in response")
+
+    old_path = dct["old_path"]
+    new_path = dct["new_path"]
+    context.stop_thinking(f"Extracted old and new file paths: {old_path}, {new_path}")
+
+    return old_path, new_path
+
+
+get_old_and_new_file_paths_prompt = """Based on the context above, extract the old and new file paths from the context.
+
+Your response must be in JSON format, and should include the following keys:
+- old_path: The old path of the file or folder
+- new_path: The new path of the file or folder
+
+Example:
+{{
+    "old_path": "path/to/old.py",
+    "new_path": "path/to/new.py",
+}}
+
+Respond only in JSON format.
+"""
 
 
 def get_file_path(context: Context) -> str:
