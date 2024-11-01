@@ -12,11 +12,25 @@ class TokenUsage(Schema):
     output: int
     total: int
 
+    def __add__(self, other: "TokenUsage") -> "TokenUsage":
+        return TokenUsage(
+            input=self.input + other.input,
+            output=self.output + other.output,
+            total=self.total + other.total,
+        )
+
 
 class TokenCost(Schema):
     input: float
     output: float
     total: float
+
+    def __add__(self, other: "TokenCost") -> "TokenCost":
+        return TokenCost(
+            input=self.input + other.input,
+            output=self.output + other.output,
+            total=self.total + other.total,
+        )
 
     @classmethod
     def for_model(

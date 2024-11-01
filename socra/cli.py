@@ -1,8 +1,10 @@
 import click
+from pydantic import ConfigDict
 
 from socra.commands.describe import Describe
 
 from dotenv import load_dotenv
+from socra.completions.base import TokenCost
 from socra.io.files import read_file, write_file
 from socra.nodes import Node
 from socra.nodes.actions.add_child import NodeAddChild
@@ -96,7 +98,13 @@ def dev(args):
                     name="Update File",
                     description="Update the contents of a file.",
                     runs=update_file,
-                )
+                ),
+                Agent(
+                    key="create_file",
+                    name="Create File",
+                    description="Create a new file.",
+                    runs=create_file,
+                ),
                 # Agent(
                 #     key = "read_file",
                 #     name = "Read File",
@@ -137,6 +145,10 @@ def dev(args):
             print("No further actions needed.")
             break
 
+    print("Cost")
+    print("Num completions:", len(ctx.completions))
+    print(ctx.token_cost)
+
 
 import typing
 
@@ -147,6 +159,26 @@ class Context(Schema):
 
     # history of action invocations
     history: typing.List[str] = []
+
+    token_cost: TokenCost = TokenCost(
+        input=0,
+        output=0,
+        total=0,
+    )
+
+    completions: typing.List[socra.Completion] = []
+
+    # allow arbitrary types
+    model_config: ConfigDict = {
+        "arbitrary_types_allowed": True,
+    }
+
+    def track_completion(self, completion: socra.Completion):
+        """
+        Tracks a completion in the execution context
+        """
+        self.completions.append(completion)
+        self.token_cost += completion.response.cost
 
     def add_invocation(self, key: str):
         self.history.append(key)
@@ -229,6 +261,7 @@ class Agent(Schema):
             on_chunk=on_chunk,
         )
         resp = cr.process()
+        context.track_completion(cr)
 
         content = resp.content
         dct = json.loads(content)
@@ -288,6 +321,84 @@ def update_file(context: Context):
         modify_file_content(context, file_path)
 
 
+def create_file(context: Context):
+    """
+    Create a new file
+    """
+    file_path = get_file_path(context)
+
+    # next, make sure file path does not exist
+    if os.path.exists(file_path):
+        return f"File path '{file_path}' already exists"
+
+    # next, create the file with blank content
+    write_file(file_path, "")
+    spinner = Spinner(message="Creating a new file")
+    spinner.message = f"Creating a new file at {file_path}"
+    spinner.finish()
+    context.add_thought(f"Created a new file at {file_path}")
+
+    # finally, we'll modify the file content
+    modify_file_content(context, file_path)
+
+    # prompt = socra.Prompt(
+    #     messages=[
+    #         *context.messages,
+    #         socra.Message(
+    #             role=socra.Message.Role.HUMAN,
+    #             content=create_file_prompt,
+    #         ),
+    #     ]
+    # )
+    # model = socra.Model.for_key(socra.Model.Key.GPT_4O_MINI_2024_07_18)
+    # spinner = Spinner(message="Creating a new file")
+
+    # @throttle(0.1)
+    # def on_chunk(chunk):
+    #     spinner.spin()
+
+    # cr = socra.Completion(
+    #     model,
+    #     prompt,
+    #     # mock_response=inputs.mock_response,
+    #     on_chunk=on_chunk,
+    # )
+    # resp = cr.process()
+    # context.track_completion(cr)
+
+    # content = resp.content
+    # dct = parse_json(content)
+    # if "file_path" not in dct:
+    #     raise ValueError("Missing 'file_path' in response")
+    # if "content" not in dct:
+    #     raise ValueError("Missing 'content' in response")
+
+    # file_path = dct["file_path"]
+    # content = dct["content"]
+
+    # thought = f"Created a new file at {file_path}"
+    # spinner.message = thought
+    # spinner.finish()
+    # context.add_thought(thought)
+    # write_file(file_path, content)
+
+
+# create_file_prompt = """Based on the context above, create a new file.
+
+# Your response must be in JSON format, and should include the following keys:
+# - file_path: The path of the new file. Include the file name and extension.
+# - content: The content of the new file
+
+# Example:
+# {{
+#     "file_path": "...",
+#     "content": "..."
+# }}
+
+# Respond only in JSON format.
+# """
+
+
 def get_file_path(context: Context) -> str:
 
     prompt = socra.Prompt(
@@ -313,9 +424,10 @@ def get_file_path(context: Context) -> str:
         on_chunk=on_chunk,
     )
     resp = cr.process()
+    context.track_completion(cr)
 
     content = resp.content
-    dct = json.loads(content)
+    dct = parse_json(content)
     if "path" not in dct:
         raise ValueError("Missing 'path' in response")
 
@@ -373,11 +485,12 @@ def should_update_file_content(context: Context, file_path: str) -> bool:
         on_chunk=on_chunk,
     )
     resp = cr.process()
+    context.track_completion(cr)
 
     content = resp.content
 
     # parse JSON response
-    dct = json.loads(content)
+    dct = parse_json(content)
 
     if "should_update" not in dct:
         raise ValueError("Missing 'should_update' in response")
@@ -451,9 +564,10 @@ def modify_file_content(context: Context, file_path: str):
         on_chunk=on_chunk,
     )
     resp = cr.process()
+    context.track_completion(cr)
 
     content = resp.content
-    dct = json.loads(content)
+    dct = parse_json(content)
     if "content" not in dct:
         raise ValueError("Missing 'content' in response")
     if "reasoning" not in dct:
@@ -547,9 +661,10 @@ def respond(context: Context):
         on_chunk=on_chunk,
     )
     resp = cr.process()
+    context.track_completion(cr)
 
     content = resp.content
-    dct = json.loads(content)
+    dct = parse_json(content)
     if "response" not in dct:
         raise ValueError("Missing 'response' in response")
 
@@ -572,6 +687,19 @@ Example:
 
 Respond only in JSON format.
 """
+
+
+def parse_json(json_str: str) -> dict:
+
+    # if begins with ```, strip first line
+    if json_str.startswith("```"):
+        json_str = json_str.split("\n", 1)[1]
+
+    # if ends with ```, strip last line
+    if json_str.endswith("```"):
+        json_str = json_str.rsplit("\n", 1)[0]
+    return json.loads(json_str)
+
 
 if __name__ == "__main__":
     cli()
