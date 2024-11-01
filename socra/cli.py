@@ -2,6 +2,7 @@ import click
 from pydantic import ConfigDict
 
 from socra.agents.file_system.actions import create_file, update_file
+from socra.agents.file_system.agent import FileSystemAgent
 from socra.commands.describe import Describe
 
 from dotenv import load_dotenv
@@ -86,25 +87,7 @@ def dev(args):
                 description="Await user input from the console before continuing. Useful when you need to ask a question or gather more information from the user.",
                 runs=await_user_input,
             ),
-            Agent(
-                key="file_system",
-                name="interact with file system",
-                description="Create, update, and manipulate files on the local file system. Call to perform any actions on files.",
-                children=[
-                    Agent(
-                        key="update_file",
-                        name="Update File",
-                        description="Update the contents of a file.",
-                        runs=update_file,
-                    ),
-                    Agent(
-                        key="create_file",
-                        name="Create File",
-                        description="Create a new file.",
-                        runs=create_file,
-                    ),
-                ],
-            ),
+            FileSystemAgent(),
             Agent(
                 key="finish",
                 name="Finish",
@@ -141,8 +124,68 @@ def dev(args):
 
 
 def await_user_input(context: Context):
-    res = input("What do you need?: ")
+
+    input_str = determine_user_input_prefix(context)
+
+    res = input(f"{input_str}: ")
     context.add_message(Message(role=Message.Role.HUMAN, content=res))
+
+
+def determine_user_input_prefix(context: Context) -> str:
+    """
+    Determine the user input prefix prompt.
+    """
+    model = socra.Model.for_key(socra.Model.Key.GPT_4O_MINI_2024_07_18)
+    spinner = Spinner(message="Determining user input prefix")
+
+    @throttle(0.1)
+    def on_chunk(chunk):
+        spinner.spin()
+
+    cr = socra.Completion(
+        model,
+        socra.Prompt(
+            messages=[
+                *context.messages,
+                socra.Message(
+                    role=socra.Message.Role.HUMAN,
+                    content=determine_user_input_prefix_prompt,
+                ),
+            ]
+        ),
+        on_chunk=on_chunk,
+    )
+    resp = cr.process()
+    context.track_completion(cr)
+
+    content = resp.content
+    dct = parse_json(content)
+    if "prompt" not in dct:
+        raise ValueError("Missing 'prompt' in response")
+
+    prompt = dct["prompt"]
+    thought = f"Determined user input prefix: {prompt}"
+    spinner.message = thought
+    spinner.finish()
+    context.add_thought(thought)
+    return prompt
+
+
+determine_user_input_prefix_prompt = """Based on the context above, what information do you need from the user?
+
+The message will be used as a prefix to the user input (e.g. 'Please provide the file path: ').
+
+Your response must be in JSON format, and should include the following keys:
+- prompt: A brief message indicating what information you need from the user.
+
+Example:
+{{
+    "prompt": "...",
+    "reasoning": "the content..."
+}}
+
+Respond only in JSON format.
+"""
 
 
 def do_nothing(context: Context):
