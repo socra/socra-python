@@ -113,10 +113,10 @@ def dev(args):
         agent.run(ctx)
 
         # if last invocation was do_nothing, break
-        if ctx.history[-1] == "finish":
-            ctx.spinner.message = "All done"
-            ctx.spinner.finish()
-            break
+        # if ctx.history[-1] == "finish":
+        #     ctx.spinner.message = "All done"
+        #     ctx.spinner.finish()
+        #     break
 
     print("Cost")
     print("Num completions:", len(ctx.completions))
@@ -189,8 +189,8 @@ Respond only in JSON format.
 
 
 def do_nothing(context: Context):
-    context.add_message(
-        Message(role=Message.Role.ASSISTANT, content="Decided to do nothing.")
+    context.stop_thinking(
+        "Finished the task. Should ask the user if they need anything else."
     )
 
 

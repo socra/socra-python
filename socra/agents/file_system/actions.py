@@ -37,6 +37,19 @@ def create_file(context: Context):
     modify_file_content(context, file_path)
 
 
+def create_directory(context: Context):
+    file_path = get_file_path(context)
+
+    if os.path.exists(file_path):
+        context.start_thinking(f"Checking if file path exists: {file_path}")
+        context.stop_thinking(f"Path path already exists: {file_path}")
+        return
+
+    context.start_thinking(f"Creating a new directory at {file_path}")
+    os.makedirs(file_path)
+    context.stop_thinking(f"New directory is now created: {file_path}")
+
+
 def get_file_path(context: Context) -> str:
 
     prompt = socra.Prompt(

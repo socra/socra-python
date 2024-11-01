@@ -1,6 +1,6 @@
 import typing
 from socra.agents.base import Agent
-from socra.agents.file_system.actions import create_file, update_file
+from socra.agents.file_system.actions import create_directory, create_file, update_file
 
 
 class FileSystemAgent(Agent):
@@ -12,15 +12,35 @@ class FileSystemAgent(Agent):
 
     children: typing.List[Agent] = [
         Agent(
-            key="create_file",
-            name="Create File",
-            description="Create a new file.",
-            runs=create_file,
+            key="files",
+            name="Files",
+            description="Create, update, and manipulate files.",
+            children=[
+                Agent(
+                    key="create_file",
+                    name="Create File",
+                    description="Create a new file.",
+                    runs=create_file,
+                ),
+                Agent(
+                    key="update_file",
+                    name="Update File",
+                    description="Update the contents of a file.",
+                    runs=update_file,
+                ),
+            ],
         ),
         Agent(
-            key="update_file",
-            name="Update File",
-            description="Update the contents of a file.",
-            runs=update_file,
+            key="directories",
+            name="Directories",
+            description="Create, update, and manipulate directories.",
+            children=[
+                Agent(
+                    key="create_directory",
+                    name="Create Directory",
+                    description="Create a new directory.",
+                    runs=create_directory,
+                ),
+            ],
         ),
     ]
