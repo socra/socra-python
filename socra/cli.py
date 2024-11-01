@@ -102,17 +102,12 @@ def dev(args):
                         description="Create a new file.",
                         runs=create_file,
                     ),
-                    # Agent(
-                    #     key = "read_file",
-                    #     name = "Read File",
-                    #     description = "Read the contents of a file.",
-                    # ),
                 ],
             ),
             Agent(
-                key="do_nothing",
-                name="Do Nothing",
-                description="Do nothing. Should be called when no further action is needed.",
+                key="finish",
+                name="Finish",
+                description="All done. Task accomplished. Should be called when no further action is needed.",
                 runs=do_nothing,
             ),
             Agent(
@@ -129,13 +124,14 @@ def dev(args):
         ctx.add_message(Message(role=Message.Role.HUMAN, content=prompt))
 
     idx = 0
-    while idx < 5:
+    while idx < 20:
         idx += 1
         agent.run(ctx)
 
         # if last invocation was do_nothing, break
-        if ctx.history[-1] == "do_nothing":
-            print("No further actions needed.")
+        if ctx.history[-1] == "finish":
+            ctx.spinner.message = "All done"
+            ctx.spinner.finish()
             break
 
     print("Cost")
@@ -178,75 +174,26 @@ def create_file(context: Context):
     file_path = get_file_path(context)
 
     # next, make sure file path does not exist
+    context.start_thinking(f"Checking if file path exists: {file_path}")
     if os.path.exists(file_path):
-        return f"File path '{file_path}' already exists"
+
+        # if file path is a directory, return taht
+        if os.path.isdir(file_path):
+            context.stop_thinking(
+                f"File path is a directory. Need to ask user for a file name: {file_path}"
+            )
+            return
+
+        context.stop_thinking(f"File already exists: {file_path}")
+        return
 
     # next, create the file with blank content
+    context.start_thinking(f"Creating a new file at {file_path}")
     write_file(file_path, "")
-    spinner = Spinner(message="Creating a new file")
-    spinner.message = f"Creating a new file at {file_path}"
-    spinner.finish()
-    context.add_thought(f"Created a new file at {file_path}")
+    context.stop_thinking(f"Created a new file at {file_path}")
 
     # finally, we'll modify the file content
     modify_file_content(context, file_path)
-
-    # prompt = socra.Prompt(
-    #     messages=[
-    #         *context.messages,
-    #         socra.Message(
-    #             role=socra.Message.Role.HUMAN,
-    #             content=create_file_prompt,
-    #         ),
-    #     ]
-    # )
-    # model = socra.Model.for_key(socra.Model.Key.GPT_4O_MINI_2024_07_18)
-    # spinner = Spinner(message="Creating a new file")
-
-    # @throttle(0.1)
-    # def on_chunk(chunk):
-    #     spinner.spin()
-
-    # cr = socra.Completion(
-    #     model,
-    #     prompt,
-    #     # mock_response=inputs.mock_response,
-    #     on_chunk=on_chunk,
-    # )
-    # resp = cr.process()
-    # context.track_completion(cr)
-
-    # content = resp.content
-    # dct = parse_json(content)
-    # if "file_path" not in dct:
-    #     raise ValueError("Missing 'file_path' in response")
-    # if "content" not in dct:
-    #     raise ValueError("Missing 'content' in response")
-
-    # file_path = dct["file_path"]
-    # content = dct["content"]
-
-    # thought = f"Created a new file at {file_path}"
-    # spinner.message = thought
-    # spinner.finish()
-    # context.add_thought(thought)
-    # write_file(file_path, content)
-
-
-# create_file_prompt = """Based on the context above, create a new file.
-
-# Your response must be in JSON format, and should include the following keys:
-# - file_path: The path of the new file. Include the file name and extension.
-# - content: The content of the new file
-
-# Example:
-# {{
-#     "file_path": "...",
-#     "content": "..."
-# }}
-
-# Respond only in JSON format.
-# """
 
 
 def get_file_path(context: Context) -> str:
