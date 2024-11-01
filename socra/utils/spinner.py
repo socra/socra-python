@@ -16,10 +16,17 @@ RED_CROSS = "\033[38;5;196m✗\033[0m"  # Red cross for failure
 
 
 class Spinner:
-    def __init__(self, message):
+    def __init__(self, message: str = None):
         self.message = message
         self.stop_spinner = False
         self.idx = 0
+
+    def reset(self):
+        self.idx = 0
+
+    def start(self):
+        self.reset()
+        self.spin()
 
     def spin(self):
         sys.stdout.write(
@@ -34,6 +41,7 @@ class Spinner:
         """
         sys.stdout.write(f"\r{GREEN_CHECKMARK} {self.message}\n")
         sys.stdout.flush()
+        self.reset()
 
     def fail(self):
         """
