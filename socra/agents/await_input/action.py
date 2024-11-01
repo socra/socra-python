@@ -1,6 +1,3 @@
-import sys
-
-
 class AwaitInputAction:
     """
     Executable action to await user input

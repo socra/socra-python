@@ -1,6 +1,5 @@
 import typing
 
-from socra.schemas import Schema
 from socra.prompts import Prompt
 from socra.messages import Message
 from socra.completions import Completion

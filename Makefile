@@ -26,6 +26,7 @@ lint:
 
 lint-fix:
 	poetry run ruff format
+	poetry run ruff check --fix
 
 
 # Trigger release workflow on github

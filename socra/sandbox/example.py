@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class UserSignup(models.Model):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
@@ -12,5 +13,6 @@ class UserSignup(models.Model):
         # Add any additional processing before saving or validations here
         super(UserSignup, self).save(*args, **kwargs)
 
-if __name__ == '__main__':
-    print('Django UserSignup Model ready!')
+
+if __name__ == "__main__":
+    print("Django UserSignup Model ready!")

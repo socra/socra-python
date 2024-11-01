@@ -1,5 +1,4 @@
 from socra.agents.context import Context
-import os
 import typing
 
 from socra.parsers import parse_json
@@ -47,7 +46,6 @@ class InputChoicesPayload(Schema):
 
 
 def get_input_choices_payload(context: Context) -> InputChoicesPayload:
-
     prompt = socra.Prompt(
         messages=[
             *context.messages,
@@ -191,5 +189,4 @@ Respond only in JSON format.
 
 
 def terminate_program(context: Context):
-
     context.stop()

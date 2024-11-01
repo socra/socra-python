@@ -12,9 +12,7 @@ from socra.agents.file_system.actions import (
 class FileSystemAgent(Agent):
     key: str = "file_system"
     name: str = "use file system"
-    description: str = (
-        "Create, update, list, and manipulate files and folders on the local file system. Call to perform any actions on files."
-    )
+    description: str = "Create, update, list, and manipulate files and folders on the local file system. Call to perform any actions on files."
 
     children: typing.List[Agent] = [
         Agent(

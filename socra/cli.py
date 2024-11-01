@@ -1,25 +1,19 @@
 import click
-from pydantic import ConfigDict
 
-from socra.agents.file_system.actions import create_file, update_file
 from socra.agents.file_system.agent import FileSystemAgent
 from socra.agents.user_interaction.agent import UserInteractionAgent
 from socra.commands.describe import Describe
 
 from dotenv import load_dotenv
-from socra.completions.base import TokenCost
-from socra.io.files import read_file, write_file
 from socra.nodes import Node
 from socra.nodes.actions.add_child import NodeAddChild
 from socra.nodes.actions.content_update import NodeContentUpdate
 from socra.nodes.actions.root import ActionKey, NodeRootAction
-from socra.schemas.base import Schema
 from socra.messages import Message
 import socra
 from socra.utils.decorators import throttle
 from socra.utils.spinner import Spinner
 import json
-import os
 
 from socra.agents import Agent, Context
 
@@ -74,7 +68,6 @@ def describe(target: str, prompt: str):
 # add optional argument that allows for user to type anything
 @click.argument("args", nargs=-1)  # This allows for any number of additional arguments
 def dev(args):
-
     prompt = " ".join(args)
 
     agent = Agent(
@@ -129,7 +122,6 @@ def dev(args):
 
 
 def await_user_input(context: Context):
-
     input_str = determine_user_input_prefix(context)
 
     res = input(f"{input_str}: ")
@@ -255,7 +247,6 @@ Respond only in JSON format.
 
 
 def parse_json(json_str: str) -> dict:
-
     # if begins with ```, strip first line
     if json_str.startswith("```"):
         json_str = json_str.split("\n", 1)[1]

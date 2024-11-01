@@ -1,7 +1,6 @@
 import typing
 from socra.agents.base import Agent
 
-from socra.agents.context import Context
 from socra.agents.user_interaction.actions import (
     input_choices,
     terminate_program,

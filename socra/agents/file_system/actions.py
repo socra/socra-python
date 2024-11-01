@@ -17,7 +17,6 @@ def create_file(context: Context):
     # next, make sure file path does not exist
     context.start_thinking(f"Checking if file path exists: {file_path}")
     if os.path.exists(file_path):
-
         # if file path is a directory, return taht
         if os.path.isdir(file_path):
             context.stop_thinking(
@@ -54,7 +53,6 @@ def create_directory(context: Context):
 
 
 def list_files_and_folders(context: Context):
-
     file_path = get_file_path(context)
 
     # next, make sure file path exists
@@ -80,7 +78,6 @@ def rename_file_or_folder(context: Context):
 
 
 def get_old_and_new_file_paths(context: Context) -> typing.Tuple[str, str]:
-
     prompt = socra.Prompt(
         messages=[
             *context.messages,
@@ -137,7 +134,6 @@ Respond only in JSON format.
 
 
 def get_file_path(context: Context) -> str:
-
     prompt = socra.Prompt(
         messages=[
             *context.messages,
@@ -189,7 +185,6 @@ Respond only in JSON format.
 
 
 def update_file(context: Context):
-
     # first, we need to get the file path from the context
     file_path = get_file_path(context)
 

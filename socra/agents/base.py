@@ -3,7 +3,6 @@ import typing
 from socra.agents.agent_decision import decide
 from socra.schemas import Schema
 from socra.agents.context import Context
-from socra.messages import Message
 
 
 class Agent(Schema):
@@ -30,8 +29,6 @@ class Agent(Schema):
 
         If the agent has no children, `runs` will be called.
         """
-
-        max_retries = 3
 
         context.add_invocation(self.key)
 
