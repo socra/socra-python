@@ -78,58 +78,50 @@ def dev(args):
         key="software_developer",
         name="Software Developer Agent",
         description="An agent that can develop software on the local file system. Especially good with file manipulation.",
-    )
-    agent.add_child(
-        Agent(
-            key="await_user_input",
-            name="Await User Input",
-            description="Await user input from the console before continuing. Useful when you need to ask a question or gather more information from the user.",
-            runs=await_user_input,
-        )
-    )
-
-    agent.add_child(
-        Agent(
-            key="file_system",
-            name="interact with file system",
-            description="Create, update, and manipulate files on the local file system. Call to perform any actions on files.",
-            children=[
-                Agent(
-                    key="update_file",
-                    name="Update File",
-                    description="Update the contents of a file.",
-                    runs=update_file,
-                ),
-                Agent(
-                    key="create_file",
-                    name="Create File",
-                    description="Create a new file.",
-                    runs=create_file,
-                ),
-                # Agent(
-                #     key = "read_file",
-                #     name = "Read File",
-                #     description = "Read the contents of a file.",
-                # ),
-            ],
-        )
-    )
-    agent.add_child(
-        Agent(
-            key="do_nothing",
-            name="Do Nothing",
-            description="Do nothing. Should be called when no further action is needed.",
-            runs=do_nothing,
-        )
-    )
-
-    agent.add_child(
-        Agent(
-            key="respond",
-            name="Respond",
-            description="Respond to the user with a message. Useful for providing a resolution or an update.",
-            runs=respond,
-        )
+        children=[
+            Agent(
+                key="await_user_input",
+                name="Await User Input",
+                description="Await user input from the console before continuing. Useful when you need to ask a question or gather more information from the user.",
+                runs=await_user_input,
+            ),
+            Agent(
+                key="file_system",
+                name="interact with file system",
+                description="Create, update, and manipulate files on the local file system. Call to perform any actions on files.",
+                children=[
+                    Agent(
+                        key="update_file",
+                        name="Update File",
+                        description="Update the contents of a file.",
+                        runs=update_file,
+                    ),
+                    Agent(
+                        key="create_file",
+                        name="Create File",
+                        description="Create a new file.",
+                        runs=create_file,
+                    ),
+                    # Agent(
+                    #     key = "read_file",
+                    #     name = "Read File",
+                    #     description = "Read the contents of a file.",
+                    # ),
+                ],
+            ),
+            Agent(
+                key="do_nothing",
+                name="Do Nothing",
+                description="Do nothing. Should be called when no further action is needed.",
+                runs=do_nothing,
+            ),
+            Agent(
+                key="respond",
+                name="Respond",
+                description="Respond to the user with a message. Useful for providing a resolution or an update.",
+                runs=respond,
+            ),
+        ],
     )
 
     ctx = Context()
