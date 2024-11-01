@@ -33,6 +33,11 @@ class Context(Schema):
 
     spinner: typing.Optional[Spinner] = Spinner()
 
+    terminated: bool = False
+
+    def stop(self):
+        self.terminated = True
+
     def start_thinking(self, message: str):
         """
         Utility message to help

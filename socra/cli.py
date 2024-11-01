@@ -3,6 +3,7 @@ from pydantic import ConfigDict
 
 from socra.agents.file_system.actions import create_file, update_file
 from socra.agents.file_system.agent import FileSystemAgent
+from socra.agents.user_interaction.agent import UserInteractionAgent
 from socra.commands.describe import Describe
 
 from dotenv import load_dotenv
@@ -81,25 +82,26 @@ def dev(args):
         name="Software Developer Agent",
         description="An agent that can develop software on the local file system. Especially good with file manipulation.",
         children=[
-            Agent(
-                key="await_user_input",
-                name="Await User Input",
-                description="Await user input from the console before continuing. Useful when you need to ask a question or gather more information from the user.",
-                runs=await_user_input,
-            ),
+            # Agent(
+            #     key="await_user_input",
+            #     name="Await User Input",
+            #     description="Await user input from the console before continuing. Useful when you need to ask a question or gather more information from the user.",
+            #     runs=await_user_input,
+            # ),
             FileSystemAgent(),
-            Agent(
-                key="finish",
-                name="Finish",
-                description="All done. Task accomplished. Should be called when no further action is needed.",
-                runs=do_nothing,
-            ),
-            Agent(
-                key="respond",
-                name="Respond",
-                description="Respond to the user with a message. Useful for providing a resolution or an update.",
-                runs=respond,
-            ),
+            UserInteractionAgent(),
+            # Agent(
+            #     key="finish",
+            #     name="Finish",
+            #     description="All done. Task accomplished. Should be called when no further action is needed.",
+            #     runs=do_nothing,
+            # ),
+            # Agent(
+            #     key="respond",
+            #     name="Respond",
+            #     description="Respond to the user with a message. Useful for providing a resolution or an update.",
+            #     runs=respond,
+            # ),
         ],
     )
 
@@ -111,6 +113,9 @@ def dev(args):
     while idx < 20:
         idx += 1
         agent.run(ctx)
+
+        if ctx.terminated:
+            break
 
         # if last invocation was do_nothing, break
         # if ctx.history[-1] == "finish":

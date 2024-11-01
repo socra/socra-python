@@ -48,7 +48,9 @@ def create_directory(context: Context):
 
     context.start_thinking(f"Creating a new directory at {file_path}")
     os.makedirs(file_path)
-    context.stop_thinking(f"New directory is now created: {file_path}")
+    context.stop_thinking(
+        f"I successfully created the directory at {file_path}. I will now move on."
+    )
 
 
 def list_files_and_folders(context: Context):

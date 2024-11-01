@@ -20,7 +20,7 @@ class FileSystemAgent(Agent):
         Agent(
             key="create_file",
             name="Create File",
-            description="Create a new file.",
+            description="Create a new file. Must already have the file path and file name in mind.",
             runs=create_file,
         ),
         Agent(

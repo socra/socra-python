@@ -16,6 +16,7 @@ langchain-community = "^0.2"
 langchain-openai = "^0.1"
 pydantic = "^2"
 tiktoken = "^0.7"
+inquirer = "^3.4.0"
 
 
 [tool.poetry.group.test.dependencies]
