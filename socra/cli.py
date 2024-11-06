@@ -64,6 +64,49 @@ def describe(target: str, prompt: str):
     command.execute()
 
 
+# @cli.command()
+# @click.argument("args", nargs=-1)  # This allows for any number of additional arguments
+# def dev2(args):
+#     prompt = " ".join(args)
+
+#     print("dev V2")
+
+#     action = Action(
+#         key="software_developer",
+#         name="Software Developer Agent",
+#         description="An agent that can develop software on the local file system. Especially good with file manipulation.",
+#         children=[
+#             Action(
+#                 key="file_system",
+#                 name="use file system",
+#                 description="Create, update, list, and manipulate files and folders on the local file system. Call to perform any actions on files.",
+#                 children=[
+#                     Action(
+#                         key="create_file",
+#                         name="Create File",
+#                         description="Create a new file. Must already have the file path and file name in mind.",
+#                         runs=hello_world,
+#                     )
+#                 ],
+#             )
+#         ],
+#     )
+
+#     from socra.context import Context
+
+#     context = Context()
+
+#     if prompt:
+#         context.add_message(Message(role=Message.Role.HUMAN, content=prompt))
+
+#     res = action.run(context)
+#     print("result", res)
+
+
+# def hello_world(context):
+#     print("Hello World", context)
+
+
 @cli.command()
 # add optional argument that allows for user to type anything
 @click.argument("args", nargs=-1)  # This allows for any number of additional arguments

@@ -118,6 +118,8 @@ def make_decision(
         mock_response=config.mock_response if config and config.mock_response else None,
     )
     resp = completion.process()
+    print("prompt")
+    print(completion.prompt)
 
     content = resp.content
     dct = json.loads(content)
@@ -165,3 +167,36 @@ Example:
 
 Respond only in JSON format.
 """
+
+
+class ActionResult(Schema):
+    pass
+
+
+class Action(Option):
+    """
+    Actions are either executable or have nested options.
+    """
+
+    runs: typing.Optional[typing.Callable[[Context], None]] = None
+    """
+    Callable that will be run when the option is chosen.
+    """
+
+    children: typing.Optional[typing.List["Action"]] = []
+    """
+    Nested actions.
+    """
+
+    def run(self, context: Context) -> ActionResult:
+        """
+        Actions take context as input and either:
+        - run a callable, or
+        - choose a nested action to run and invoke it.
+        """
+
+        if self.runs is not None:
+            return self.runs(context)
+
+        decision = Decision.make(context, self.children)
+        return decision.option.run(context)
