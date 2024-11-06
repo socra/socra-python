@@ -32,7 +32,7 @@ class Completion:
         model: Model,
         prompt: Prompt,
         mock_response: MockResponse = None,
-        on_chunk: typing.Callable = None,
+        on_chunk: typing.Optional[typing.Callable[[ChunkPayload], None]] = None,
     ):
         self.model = model
         self.prompt = prompt

@@ -15,7 +15,7 @@ publish:
 
 
 test:
-	poetry run pytest
+	poetry run pytest -s
 
 format:
 	poetry run ruff format

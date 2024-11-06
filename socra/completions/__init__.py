@@ -1,3 +1,3 @@
-from socra.completions.base import Completion
+from socra.completions.base import Completion, ChunkPayload, MockResponse
 
-__all__ = ["Completion"]
+__all__ = ["Completion", "ChunkPayload", "MockResponse"]

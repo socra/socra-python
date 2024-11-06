@@ -1,3 +1,3 @@
-from socra.messages.base import Message
+from socra.messages.base import Message, MessageRole
 
-__all__ = ["Message"]
+__all__ = ["Message", "MessageRole"]
