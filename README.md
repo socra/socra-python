@@ -1,10 +1,10 @@
 # socra
-![logo](https://socra.com/images/og/socra_1400x700.png)
+![logo](https://journeys.socra.com/images/og/socra_3600x1800.png)
 
 
 🧬 Let your codebase improve itself with AI, from the command line.
 
-[![Release Notes](https://img.shields.io/github/v/release/socra/socra.svg?style=flat-square)](https://github.com/socra/socra-python/releases)
+[![Release Notes](https://img.shields.io/github/v/release/socra/socra-python.svg?style=flat-square)](https://github.com/socra/socra-python/releases)
 [![PyPI - License](https://img.shields.io/pypi/l/socra?style=flat-square)](https://opensource.org/licenses/MIT)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/socra?style=flat-square)](https://pypistats.org/packages/socra)
 [![GitHub star chart](https://img.shields.io/github/stars/socra/socra-python?style=flat-square)](https://star-history.com/#socra/socra-python)
